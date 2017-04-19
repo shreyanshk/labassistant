@@ -1,5 +1,8 @@
-from subprocess import run
 import os
+import socket
+import struct
+import sys
+import ssl
 
 def generatekey(param):
     exist = os.path.isfile("/usr/bin/openssl")
@@ -41,13 +44,26 @@ def verifyKeys():
         verify = privatekey.split("\n")
         if ((verify[0] != "-----BEGIN EC PRIVATE KEY-----") or (verify[4] != "-----END EC PRIVATE KEY-----")):
             verifyerror = True
+            print("error in privatekey")
         verify = publickey.split("\n")
         if ((verify[0] != "-----BEGIN PUBLIC KEY-----") or (verify[3] != "-----END PUBLIC KEY-----")):
             verifyerror = True
-        if (verifyerror):
-            print("Generating new key pair")
-            generatekey("secp256k1")
-        else:
-            pass
+            print("error in publickey")
+
     except FileNotFoundError:
-        generatekey("secp256k1")
+        verifyerror = True
+        print("File not found")
+    return verifyerror
+
+def createSocket(address,port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    serverif = (address, port)
+    sock.bind(serverif)
+    return sock
+
+def Send(message,address,sock):
+    try:
+        print(sys.stderr, 'sending "%s"' % message)
+        sent = sock.sendto(message.encode(), address)
+    except:
+        print("Error in sending  Data")
