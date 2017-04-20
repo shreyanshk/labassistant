@@ -33,6 +33,13 @@ def generatekey(param):
     else:
         return exist
 
+def signMessage(key, data):
+    signature = key.sign(
+        data,
+        ec.ECDSA(hashes.SHA256())
+    )
+    return signature
+
 def verifyKeys():
     try:
         privatekey = open("privatekey.pem", 'r').read()
@@ -51,3 +58,6 @@ def verifyKeys():
             pass
     except FileNotFoundError:
         generatekey("secp256k1")
+
+def loadPrivateKey(filename):
+    pass
