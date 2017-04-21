@@ -3,12 +3,7 @@ import struct
 from common import Common
 
 class Slave(Common):
-    def run(self, mcastGroup = None, key = None):
-        if key == None:
-            try:
-                privateKey = self.loadPrivateKey('privatekey.pem')
-            except FileNotFoundError:
-                generatekey('SECP256K1')
+    def run(self, mcastGroup = None):
         if mcastGroup == None:
             mcastGroup = ('224.3.29.71', 24979)
         mcastSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)

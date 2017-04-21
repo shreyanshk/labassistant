@@ -1,64 +1,23 @@
-from subprocess import run
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
 import os
 
 class Common:
     def __init__(self):
-        self.privatekey = None
+        self.privateKey = None
+        self.loadParam()
     def generatekey(param):
-        exist = os.path.isfile("/usr/bin/openssl")
-        if (exist):
-            cmd = [
-                'openssl',
-                'ecparam',
-                '-name',
-                param,
-                '-genkey',
-                '-noout',
-                '-out',
-                'privatekey.pem'
-            ]
-            error = run(cmd).returncode
-            if (error != 0):
-                return error
-            cmd = [
-                'openssl',
-                'ec',
-                '-in',
-                'privatekey.pem',
-                '-pubout',
-                '-out',
-                'publickey.pem'
-            ]
-            error = run(cmd).returncode
-            if (error != 0):
-                return error
-            else:
-                return exist
-        else:
-            return exist
-    def signMessage(key, data):
-        signature = key.sign(
+        self.privateKey = ec.generate_private_key(
+            ec.SECP256K1(), default_backend()
+        )
+    def saveParams():
+        pass
+    def signMessage(self, data):
+        signature = self.privateKey.sign(
             data,
-            ec.ECDSA(hashes.SHA256())
+            ec.ECDSA(hashes.SHA512()) #check if it's secure
         )
         return signature
-    def verifyKeys():
-        try:
-            privatekey = open("privatekey.pem", 'r').read()
-            publickey = open("publickey.pem", 'r').read()
-            verifyerror = False
-            verify = privatekey.split("\n")
-            if ((verify[0] != "-----BEGIN EC PRIVATE KEY-----") or (verify[4] != "-----END EC PRIVATE KEY-----")):
-                verifyerror = True
-            verify = publickey.split("\n")
-            if ((verify[0] != "-----BEGIN PUBLIC KEY-----") or (verify[3] != "-----END PUBLIC KEY-----")):
-                verifyerror = True
-            if (verifyerror):
-                print("Generating new key pair")
-                generatekey("secp256k1")
-            else:
-                pass
-        except FileNotFoundError:
-            generatekey("secp256k1")
-    def loadPrivateKey(self, filename):
+    def loadParam(self, filename = None):
         pass
