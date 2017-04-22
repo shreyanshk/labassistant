@@ -1,25 +1,14 @@
 import socket
-import ssl
-from common import *
-from masterUtil import *
-import sqlite3
-import struct
-import sys
+from common import Common
+from time import sleep
 
-multicast_group = ('224.3.29.71', 24979)
+class Master(Common):
+    def run(self, mcastGroup = None):
+        if mcastGroup == None:
+            mcastGroup = ('224.3.29.71', 24979)
+        mcastSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        mcastSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
 
-
-def run():
-    createDB()
-    message="connect"
-    if(verifyKeys()==True):
-        generatekey("secp256k1")
-        run()
-    publickey = open("publickey.pem", 'r').read()
-    sock = createSocket("169.254.188.114",0)
-    MasterSocketConfig(sock)
-    Send(message,multicast_group,sock)
-    MasterReceive(sock)
-    Send(publickey,multicast_group,sock)
-    print(sys.stderr, 'closing socket')
-    sock.close()
+        while (True):
+            mcastSocket.sendto(b"this is a test", mcastGroup)
+            sleep(1)

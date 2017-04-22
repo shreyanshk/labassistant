@@ -1,33 +1,16 @@
 import socket
-import ssl
-from common import *
 import struct
-import sys
-import pickle
-import json
-from slaveUtil import *
-param = {}
-multicast_group = '224.3.29.71'
-server_address = ('', 24979)
+from common import Common
 
-def run():
-    param = ReadPickle()
-    if(verifyKeys()==True):
-        generatekey("secp256k1")
-        run()
-    publickey = open("publickey.pem", 'r').read()
-    msg = {}
-    msg["akg"] = "Connection is acknowledged"
-    msg["publickey"] = publickey
-    msg["friendlyName"] = param["friendlyName"]
-    connMsg = json.dumps(msg)
-    sock = createSocket('', 24979)
-    SlaveSocketConfig(sock,multicast_group)
-    while True:
-        data,address = SlaveReceive(sock,"Waiting for connection")
-        if(data.decode() == "connect"):
-            Send(connMsg,address,sock)
-            data,address = SlaveReceive(sock,"Waiting for Master Public Key")
-            param["Master Public Key"] = data
-            param["Master address"] = address
-            WritePickle(param)
+class Slave(Common):
+    def run(self, mcastGroup = None):
+        if mcastGroup == None:
+            mcastGroup = ('224.3.29.71', 24979)
+        mcastSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        mcastSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        mcastSocket.bind(mcastGroup)
+        mreq = struct.pack("4sl", socket.inet_aton(mcastGroup[0]), socket.INADDR_ANY) #idk
+        mcastSocket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        while (True):
+            print(mcastSocket.recv(1024))

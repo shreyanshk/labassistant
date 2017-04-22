@@ -1,70 +1,46 @@
-from subprocess import run
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import serialization
 import os
-import socket
-import struct
-import sys
-import ssl
+import pickle
 
-def generatekey(param):
-    exist = os.path.isfile("/usr/bin/openssl")
-    if (exist):
-        cmd = [
-            'openssl',
-            'ecparam',
-            '-name',
-            param,
-            '-genkey',
-            '-noout',
-            '-out',
-            'privatekey.pem'
-        ]
-        error = run(cmd).returncode
-        if (error != 0):
-            return error
-        cmd = [
-            'openssl',
-            'ec',
-            '-in',
-            'privatekey.pem',
-            '-pubout',
-            '-out',
-            'publickey.pem'
-        ]
-        error = run(cmd).returncode
-        if (error != 0):
-            return error
-        return exist
-    else:
-        return exist
+class Common:
+	def __init__(self):
+		try:
+			self.loadParam()
+		except FileNotFoundError:
+			self.param = {}
+			self.privateKey = ec.generate_private_key(
+				ec.SECP256K1(),
+				default_backend()
+			)
+			self.param['friendlyName'] = input("Enter your friendly name: ")
+			self.saveParams()
 
-def verifyKeys():
-    try:
-        privatekey = open("privatekey.pem", 'r').read()
-        publickey = open("publickey.pem", 'r').read()
-        verifyerror = False
-        verify = privatekey.split("\n")
-        if ((verify[0] != "-----BEGIN EC PRIVATE KEY-----") or (verify[4] != "-----END EC PRIVATE KEY-----")):
-            verifyerror = True
-            print("error in privatekey")
-        verify = publickey.split("\n")
-        if ((verify[0] != "-----BEGIN PUBLIC KEY-----") or (verify[3] != "-----END PUBLIC KEY-----")):
-            verifyerror = True
-            print("error in publickey")
+	def saveParams(self):
+		serializedPrivateKey = self.privateKey.private_bytes(
+			encoding = serialization.Encoding.PEM,
+			format = serialization.PrivateFormat.PKCS8,
+			encryption_algorithm = serialization.NoEncryption()
+		)
+		data  = (self.param, serializedPrivateKey)
+		with open('param.pickle', 'wb') as f:
+			pickle.dump(data, f)
 
-    except FileNotFoundError:
-        verifyerror = True
-        print("File not found")
-    return verifyerror
+	def signMessage(self, data):
+		signature = self.privateKey.sign(data,ec.ECDSA(hashes.SHA512())) #check if it's secure
+		return signature
 
-def createSocket(address,port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    serverif = (address, port)
-    sock.bind(serverif)
-    return sock
+	def loadParam(self):
+		with open('param.pickle', 'rb') as f:
+			data = pickle.load(f)
+			self.param = data[0]
+			self.privateKey = serialization.load_pem_private_key(
+				data[1],
+				password = None,
+				backend = default_backend()
+			)
 
-def Send(message,address,sock):
-    try:
-        print(sys.stderr, 'sending "%s"' % message)
-        sent = sock.sendto(message.encode(), address)
-    except:
-        print("Error in sending  Data")
+if __name__ == '__main__':
+	c = Common()
