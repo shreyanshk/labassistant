@@ -1,14 +1,28 @@
 import socket
 from common import Common
 from time import sleep
+import pickle
 
 class Master(Common):
-    def run(self, mcastGroup = None):
-        if mcastGroup == None:
-            mcastGroup = ('224.3.29.71', 24979)
-        mcastSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        mcastSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+	def shutdown(self, timer = 0, force = False):
+		cmd = {
+		'shutdown': (timer, force)
+		}
+		data = self.signedCmd(cmd)
+		self.mcastSocket.sendto(data, self.mcastGroup)
 
-        while (True):
-            mcastSocket.sendto(b"this is a test", mcastGroup)
-            sleep(1)
+	def displayString(self, string):
+		cmd = {
+			'echo': (string)
+		}
+		data = self.signedCmd(cmd)
+		self.mcastSocket.sendto(data, self.mcastGroup)
+		
+	def run(self, mcastGroup = None):
+		if mcastGroup == None:
+			self.mcastGroup = ('224.3.29.71', 24979)
+		self.mcastSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+		self.mcastSocket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+		while (True):
+			self.displayString("Hello")
+			sleep(5)

@@ -15,6 +15,16 @@ class Common:
 				ec.SECP256K1(),
 				default_backend()
 			)
+			self.param['serializedPrivateKey'] = self.privateKey.private_bytes(
+				encoding = serialization.Encoding.PEM,
+				format = serialization.PrivateFormat.PKCS8,
+				encryption_algorithm = serialization.NoEncryption()
+			)
+			self.publicKey = self.privateKey.public_key()
+			self.param['serializedPublicKey'] = self.publicKey.public_bytes(
+				encoding = serialization.Encoding.PEM,
+				format=serialization.PublicFormat.SubjectPublicKeyInfo
+			)
 			self.param['friendlyName'] = input("Enter your friendly name: ")
 			self.saveParams()
 
@@ -28,9 +38,16 @@ class Common:
 		with open('param.pickle', 'wb') as f:
 			pickle.dump(data, f)
 
-	def signMessage(self, data):
-		signature = self.privateKey.sign(data,ec.ECDSA(hashes.SHA512())) #check if it's secure
-		return signature
+	def signedCmd(self, cmd):
+		data = pickle.dumps(cmd)
+		signature = self.privateKey.sign(
+			data,
+			ec.ECDSA(hashes.SHA512())
+		) #check if it's secure
+		return pickle.dumps({
+			'data': data,
+			'signature': signature
+		})
 
 	def loadParam(self):
 		with open('param.pickle', 'rb') as f:
