@@ -7,6 +7,7 @@ import threading
 class Master(Common):
 	def shutdown(self, timer = 0, force = False):
 		cmd = {
+		'cmd': 'shutdown',
 		'shutdown': (timer, force)
 		}
 		data = self.signedCmd(cmd)
@@ -14,7 +15,8 @@ class Master(Common):
 
 	def displayString(self, string):
 		cmd = {
-			'echo': (string)
+			'cmd': 'displayString',
+			'displayString': (string)
 		}
 		data = self.signedCmd(cmd)
 		self.mcastSocket.sendto(data, self.mcastGroup)
@@ -27,9 +29,13 @@ class Master(Common):
 		heartbeatThread = threading.Thread(target = self.heartbeat)
 		heartbeatThread.daemon = False
 		heartbeatThread.start()
+		while True:
+			self.displayString("Test string.")
+			sleep(1)
 
 	def heartbeat(self, timer = 5):
 		data = {
+			'type': 'heartbeat',
 			'serializedPublicKey': self.param['serializedPublicKey'],
 			'friendlyName': self.param['friendlyName']
 		}

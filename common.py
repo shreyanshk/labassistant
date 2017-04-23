@@ -45,6 +45,7 @@ class Common:
 			ec.ECDSA(hashes.SHA512())
 		) #check if it's secure
 		return pickle.dumps({
+			'type': 'cmd',
 			'data': data,
 			'signature': signature
 		})

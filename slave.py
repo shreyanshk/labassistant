@@ -93,7 +93,7 @@ class Slave(Common):
 		print(string)
 
 	def shutdown(self, force = False, timer = 0) :
-		print("The system will shut down in" + timer + "seconds" )
+		print("The system will shut down in " + str(timer) + " seconds." )
 		sleep(timer)
 		os.system("shutdown now -h")
 
