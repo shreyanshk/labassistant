@@ -59,12 +59,15 @@ class Common:
 				backend = default_backend()
 			)
 
-	def verifyMsg(self,publicKey,signature,msg):
-		verifier = publicKey.verifier(signature,
-			ec.ECDSA(hashes.SHA512())
-		)
-		verifier.update(msg)
-		return verifier.verify()
+	def verifyMsg(self, publicKey, rcvData):
+		try:
+			verifier = publicKey.verifier(rcvData['signature'],
+				ec.ECDSA(hashes.SHA512())
+			)
+			verifier.update(rcvData['data'])
+			return verifier.verify()
+		except:
+			return False
 
 if __name__ == '__main__':
 	c = Common()
