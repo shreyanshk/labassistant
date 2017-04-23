@@ -78,7 +78,7 @@ class Slave(Common):
 				if (function == None):
 					self.cmdNotFoundError(cmds['cmd'])
 				else:
-					function(cmds[cmds['cmd']])
+					function(cmds['args'])
 
 	def cmdNotFoundError(self, string):
 		data = {
@@ -105,4 +105,3 @@ class Slave(Common):
 			'shutdown': self.shutdown
 		}
 		return cmds[string]
-

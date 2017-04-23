@@ -8,7 +8,7 @@ class Master(Common):
 	def shutdown(self, timer = 0, force = False):
 		cmd = {
 		'cmd': 'shutdown',
-		'shutdown': (timer, force)
+		'args': (timer, force)
 		}
 		data = self.signedCmd(cmd)
 		self.mcastSocket.sendto(data, self.mcastGroup)
@@ -16,7 +16,7 @@ class Master(Common):
 	def displayString(self, string):
 		cmd = {
 			'cmd': 'displayString',
-			'displayString': (string)
+			'args': (string)
 		}
 		data = self.signedCmd(cmd)
 		self.mcastSocket.sendto(data, self.mcastGroup)
