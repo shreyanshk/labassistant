@@ -15,7 +15,7 @@ class Master(Common):
 
 	def reboot(self, force = False, timer = 0) :
 		cmd: {
-			'cmd': 'reboot'
+			'cmd': 'reboot',
 			'args': (force, timer)
 		}
 		data = self.signedCmd(cmd)
