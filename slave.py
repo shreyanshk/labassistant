@@ -97,11 +97,20 @@ class Slave(Common):
 		sleep(timer)
 		os.system("shutdown now -h")
 
+	def reboot(self, force = False, timer = 0) :
+		print("The system will reboot in " + str(timer) + " seconds." )
+		sleep(timer)
+		if (force):
+			os.system("reboot --force")
+		else:
+			os.system("reboot")
+
 # function definitions end here
 
 	def dispatcher(self, string):
 		cmds = {
 			'displayString': self.displayString,
+			'reboot': self.reboot
 			'shutdown': self.shutdown
 		}
 		return cmds[string]

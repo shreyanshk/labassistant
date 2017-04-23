@@ -5,18 +5,26 @@ import pickle
 import threading
 
 class Master(Common):
-	def shutdown(self, timer = 0, force = False):
-		cmd = {
-		'cmd': 'shutdown',
-		'args': (timer, force)
-		}
-		data = self.signedCmd(cmd)
-		self.mcastSocket.sendto(data, self.mcastGroup)
-
 	def displayString(self, string):
 		cmd = {
 			'cmd': 'displayString',
 			'args': (string)
+		}
+		data = self.signedCmd(cmd)
+		self.mcastSocket.sendto(data, self.mcastGroup)
+
+	def reboot(self, force = False, timer = 0) :
+		cmd: {
+			'cmd': 'reboot'
+			'args': (force, timer)
+		}
+		data = self.signedCmd(cmd)
+		self.mcastSocket.sendto(data, self.mcastGroup)
+
+	def shutdown(self, timer = 0, force = False):
+		cmd = {
+		'cmd': 'shutdown',
+		'args': (timer, force)
 		}
 		data = self.signedCmd(cmd)
 		self.mcastSocket.sendto(data, self.mcastGroup)
