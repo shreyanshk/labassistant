@@ -4,12 +4,12 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
 import os
 import pickle
-
 class Common:
 	def __init__(self):
 		try:
 			self.loadParam()
-		except FileNotFoundError:
+		except:
+			print("Configuration not found or corrupted. Creating new configuration")
 			self.param = {}
 			self.privateKey = ec.generate_private_key(
 				ec.SECP256K1(),
@@ -58,6 +58,13 @@ class Common:
 				password = None,
 				backend = default_backend()
 			)
+
+	def verifyMsg(self,publicKey,signature,msg):
+		verifier = publicKey.verifier(signature,
+			ec.ECDSA(hashes.SHA512())
+		)
+		verifier.update(msg)
+		return verifier.verify()
 
 if __name__ == '__main__':
 	c = Common()
