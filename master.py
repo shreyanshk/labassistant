@@ -38,7 +38,7 @@ class Master(Common):
 		heartbeatThread.daemon = False
 		heartbeatThread.start()
 		while True:
-			self.displayString("Test string.")
+			self.reboot()
 			sleep(1)
 
 	def heartbeat(self, timer = 5):

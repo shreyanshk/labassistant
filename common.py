@@ -69,6 +69,3 @@ class Common:
 			return verifier.verify()
 		except:
 			return False
-
-if __name__ == '__main__':
-	c = Common()

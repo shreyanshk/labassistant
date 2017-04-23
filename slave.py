@@ -92,13 +92,16 @@ class Slave(Common):
 	def displayString(self,string):
 		print(string)
 
-	def shutdown(self, force = False, timer = 0) :
-		print("The system will shut down in " + str(timer) + " seconds." )
+	def shutdown(self, force = False, timer = 0):
+		print("The system will shut down in " + str(timer) + " seconds.")
 		sleep(timer)
-		os.system("shutdown now -h")
+		if (force):
+			os.system("shutdown now -h")
+		else:
+			os.system("shutdown -h")
 
-	def reboot(self, force = False, timer = 0) :
-		print("The system will reboot in " + str(timer) + " seconds." )
+	def reboot(self, force = False, timer = 0):
+		print("The system will reboot in " + str(timer) + " seconds.")
 		sleep(timer)
 		if (force):
 			os.system("reboot --force")
@@ -110,7 +113,7 @@ class Slave(Common):
 	def dispatcher(self, string):
 		cmds = {
 			'displayString': self.displayString,
-			'reboot': self.reboot
+			'reboot': self.reboot,
 			'shutdown': self.shutdown
 		}
 		return cmds[string]
