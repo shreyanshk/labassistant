@@ -14,7 +14,7 @@ class Master(Common):
 		self.mcastSocket.sendto(data, self.mcastGroup)
 
 	def reboot(self, force = False, timer = 0) :
-		cmd: {
+		cmd = {
 			'cmd': 'reboot',
 			'args': (force, timer)
 		}
@@ -38,7 +38,7 @@ class Master(Common):
 		heartbeatThread.daemon = False
 		heartbeatThread.start()
 		while True:
-			self.reboot()
+			self.displayString("Test String.")
 			sleep(1)
 
 	def heartbeat(self, timer = 5):
